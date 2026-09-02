@@ -163,10 +163,20 @@
     }
   }
 
-  function topMajors(all, n) {
+  function currentMajors() {
+    const set = new Set();
+    for (const ch of ['Stable', 'Beta', 'Dev', 'Canary']) {
+      const info = state.latest[ch];
+      if (info) set.add(String(info.version).split('.')[0]);
+    }
+    return set;
+  }
+
+  function topMajors(all, n, skipSet) {
     const byMajor = new Map();
     for (const v of all) {
       const major = String(v.version).split('.')[0];
+      if (skipSet && skipSet.has(major)) continue;
       const prev = byMajor.get(major);
       if (!prev || compareVersion(v.version, prev.version) > 0) {
         byMajor.set(major, v);
@@ -210,7 +220,7 @@
   function renderMajorVersions() {
     const list = $('majorList');
     list.textContent = '';
-    for (const v of topMajors(state.all, 10)) {
+    for (const v of topMajors(state.all, 10, currentMajors())) {
       list.appendChild(createVersionRow(v));
     }
   }
