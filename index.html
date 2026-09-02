@@ -34,9 +34,14 @@
       </div>
     </section>
 
-    <section>
+    <section id="latestSection">
       <h2 class="section-title">Latest versions</h2>
       <div class="cards" id="latestCards"></div>
+    </section>
+
+    <section id="majorSection">
+      <h2 class="section-title">Major versions <span class="section-sub">latest 10 major releases</span></h2>
+      <div class="list" id="majorList"></div>
     </section>
 
     <section id="searchSection" class="hidden">
@@ -71,6 +76,19 @@
           <li>Debian/Ubuntu: <code>sudo apt-mark hold google-chrome-stable</code></li>
           <li>Fedora/RHEL: <code>sudo dnf versionlock google-chrome-stable</code></li>
         </ul>
+      </div>
+    </details>
+
+    <details class="howto">
+      <summary>macOS: "app is damaged" when opening</summary>
+      <div class="howto-body">
+        <p>Chrome for Testing is not Apple-notarized, so Gatekeeper flags it as damaged (it is not actually broken). Remove the quarantine attribute:</p>
+        <ol>
+          <li>Extract the zip and locate <code>Google Chrome for Testing.app</code>.</li>
+          <li>Open Terminal and run the following (drag the <code>.app</code> into the window to fill its path):<br><code>xattr -cr "/path/to/Google Chrome for Testing.app"</code></li>
+          <li>If it is still blocked, prefix with sudo: <code>sudo xattr -cr "..."</code>.</li>
+        </ol>
+        <p>Alternative: System Settings → Privacy &amp; Security → click "Open Anyway".</p>
       </div>
     </details>
 

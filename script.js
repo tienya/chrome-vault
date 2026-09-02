@@ -26,6 +26,7 @@
     component: 'chrome',
     query: '',
     latest: {},
+    all: [],
   };
 
   let indexPromise = null;
@@ -162,6 +163,58 @@
     }
   }
 
+  function topMajors(all, n) {
+    const byMajor = new Map();
+    for (const v of all) {
+      const major = String(v.version).split('.')[0];
+      const prev = byMajor.get(major);
+      if (!prev || compareVersion(v.version, prev.version) > 0) {
+        byMajor.set(major, v);
+      }
+    }
+    return Array.from(byMajor.entries())
+      .sort((a, b) => Number(b[0]) - Number(a[0]))
+      .slice(0, n)
+      .map(([, v]) => v);
+  }
+
+  function createVersionRow(v) {
+    const url = findUrl(v, state.component, state.platform);
+
+    const row = document.createElement('div');
+    row.className = 'row';
+
+    const info = document.createElement('div');
+    info.className = 'row-info';
+
+    const version = document.createElement('span');
+    version.className = 'version';
+    version.textContent = v.version;
+
+    const rev = document.createElement('span');
+    rev.className = 'revision';
+    rev.textContent = 'r' + v.revision;
+
+    info.appendChild(version);
+    info.appendChild(rev);
+
+    const actions = document.createElement('div');
+    actions.className = 'row-actions';
+    actions.appendChild(makeDownload(url, v.version));
+
+    row.appendChild(info);
+    row.appendChild(actions);
+    return row;
+  }
+
+  function renderMajorVersions() {
+    const list = $('majorList');
+    list.textContent = '';
+    for (const v of topMajors(state.all, 10)) {
+      list.appendChild(createVersionRow(v));
+    }
+  }
+
   function renderSearchResults(matches) {
     const list = $('searchList');
     list.textContent = '';
@@ -174,48 +227,30 @@
 
     status.textContent = matches.length + ' result' + (matches.length > 1 ? 's' : '') + '.';
     for (const v of matches.slice(0, 30)) {
-      const url = findUrl(v, state.component, state.platform);
-
-      const row = document.createElement('div');
-      row.className = 'row';
-
-      const info = document.createElement('div');
-      info.className = 'row-info';
-
-      const version = document.createElement('span');
-      version.className = 'version';
-      version.textContent = v.version;
-
-      const rev = document.createElement('span');
-      rev.className = 'revision';
-      rev.textContent = 'r' + v.revision;
-
-      info.appendChild(version);
-      info.appendChild(rev);
-
-      const actions = document.createElement('div');
-      actions.className = 'row-actions';
-      actions.appendChild(makeDownload(url, v.version));
-
-      row.appendChild(info);
-      row.appendChild(actions);
-      list.appendChild(row);
+      list.appendChild(createVersionRow(v));
     }
   }
 
-  function hideSearch() {
+  function showDefault() {
+    $('latestSection').classList.remove('hidden');
+    $('majorSection').classList.remove('hidden');
     $('searchSection').classList.add('hidden');
+  }
+
+  function showSearch() {
+    $('latestSection').classList.add('hidden');
+    $('majorSection').classList.add('hidden');
+    $('searchSection').classList.remove('hidden');
   }
 
   async function doSearch() {
     const q = state.query.trim().toLowerCase();
     if (!q) {
-      hideSearch();
+      showDefault();
       return;
     }
 
-    const section = $('searchSection');
-    section.classList.remove('hidden');
+    showSearch();
     $('searchStatus').textContent = 'Searching…';
     $('searchList').textContent = '';
 
@@ -231,6 +266,7 @@
 
   function refresh() {
     renderLatest();
+    renderMajorVersions();
     if (!$('searchSection').classList.contains('hidden')) {
       doSearch();
     }
@@ -264,9 +300,14 @@
 
     $('loading').classList.remove('hidden');
     try {
-      const latest = await fetchJson(ENDPOINTS.latest);
+      const [latest, all] = await Promise.all([
+        fetchJson(ENDPOINTS.latest),
+        loadIndex(),
+      ]);
       state.latest = latest.channels || {};
+      state.all = all;
       renderLatest();
+      renderMajorVersions();
     } catch (err) {
       showError(err);
     } finally {

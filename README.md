@@ -23,10 +23,8 @@ All download links point to Google's official storage (`storage.googleapis.com`)
 Hosted on GitHub Pages at:
 
 ```
-https://<username>.github.io/chrome-vault/
+https://tienya.github.io/chrome-vault/
 ```
-
-Replace `<username>` with your GitHub username.
 
 ### Enable GitHub Pages
 
