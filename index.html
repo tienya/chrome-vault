@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Download specific versions of Chrome, ChromeDriver and Headless Shell. Data from Google Chrome for Testing.">
+  <meta name="theme-color" content="#1a73e8">
+  <title>Chrome Version Downloader</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%234285f4'/%3E%3Ccircle cx='50' cy='50' r='24' fill='%23ffffff'/%3E%3Ccircle cx='50' cy='50' r='12' fill='%234285f4'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="hero">
+    <div class="logo"></div>
+    <h1>Chrome Version Downloader</h1>
+    <p>Download specific versions of Chrome, ChromeDriver and Headless Shell — data from Google Chrome for Testing</p>
+  </header>
+
+  <main>
+    <section class="toolbar">
+      <div class="field">
+        <label>Platform</label>
+        <div class="seg" id="platformSeg"></div>
+      </div>
+
+      <div class="field">
+        <label>Component</label>
+        <div class="seg" id="componentSeg"></div>
+      </div>
+
+      <div class="field">
+        <label>Search a specific version</label>
+        <input id="searchInput" class="search-input" type="text" placeholder="e.g. 120.0.6099" autocomplete="off">
+      </div>
+    </section>
+
+    <section>
+      <h2 class="section-title">Latest versions</h2>
+      <div class="cards" id="latestCards"></div>
+    </section>
+
+    <section id="searchSection" class="hidden">
+      <h2 class="section-title">Search results</h2>
+      <div id="searchStatus" class="search-status"></div>
+      <div class="list" id="searchList"></div>
+    </section>
+
+    <details class="howto">
+      <summary>How to disable Chrome auto-update</summary>
+      <div class="howto-body">
+        <p>The portable Chrome for Testing builds downloaded here do <strong>not</strong> auto-update — they stay at the version you chose. The steps below only apply to a normally <em>installed</em> Chrome.</p>
+        <p>Chrome auto-updates in the background, which will replace a pinned version. Disable it per OS below.</p>
+
+        <h4>Windows</h4>
+        <ol>
+          <li>Press <code>Win + R</code>, run <code>services.msc</code>.</li>
+          <li>Find <code>Google Update Service (gupdate)</code> and <code>Google Update Service (gupdatem)</code>.</li>
+          <li>Right-click each, choose <strong>Properties</strong>, set <em>Startup type</em> to <strong>Disabled</strong>, then <strong>Stop</strong>.</li>
+        </ol>
+        <p>Or via registry (admin): create DWORD <code>AutoUpdateCheckPeriodMinutes</code> = <code>0</code> under <code>HKLM\SOFTWARE\Policies\Google\Update</code>.</p>
+
+        <h4>macOS</h4>
+        <ol>
+          <li>Quit Chrome.</li>
+          <li>Rename the updater folder: <code>~/Library/Google/GoogleSoftwareUpdate</code> → <code>GoogleSoftwareUpdate.bak</code>.</li>
+        </ol>
+        <p>Or run: <code>defaults write com.google.Keystone.Agent checkInterval 0</code></p>
+
+        <h4>Linux</h4>
+        <ul>
+          <li>Debian/Ubuntu: <code>sudo apt-mark hold google-chrome-stable</code></li>
+          <li>Fedora/RHEL: <code>sudo dnf versionlock google-chrome-stable</code></li>
+        </ul>
+      </div>
+    </details>
+
+    <div id="errorBox" class="error-box hidden"></div>
+  </main>
+
+  <footer>
+    <p>Data source: <a href="https://googlechromelabs.github.io/chrome-for-testing/" target="_blank" rel="noopener noreferrer">Chrome for Testing</a> · Downloads point to Google's official storage (storage.googleapis.com)</p>
+  </footer>
+
+  <div id="loading" class="loading hidden">
+    <div class="spinner"></div>
+    <div class="loading-text">Loading latest versions…</div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
